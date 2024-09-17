@@ -1,24 +1,29 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const User = require('../../models/user');
-// import * as tf from '@tensorflow/tfjs';
+const spawn = require('child_process').spawn;
+const path = require('path');
+const AdmZip = require("adm-zip");
 
-exports.batchProcess = async (req, res) => {
-  console.log('????????????????', req.body);
-  const { files } = req.body;
+exports.batchProcess = async (req, res, baseImagePath) =>  {
+  try {
+    let dataToSend;
+    const imagePaths = req.files.map(file => `${baseImagePath}/${file.path}`);
+    const pythonProcess = await spawn('python3', [
+      `${baseImagePath}/test.py`, imagePaths.join(', ')
+    ]);
 
-  // Find user by email
-  const model = await tf.loadLayersModel('https://foo.bar/tfjs_artifacts/model.json');
+    pythonProcess.stdout.on('data', (data) => {
+      dataToSend = data.toString();
+      console.log('Receiving data from python script...', dataToSend);
+    });
 
-  // Check if user exists and password matches
-  if (!user || !bcrypt.compareSync(password, user.password)) {
-    return res.status(401).json({ message: 'Invalid email or password' });
+    pythonProcess.on('close', async (code) => {
+      console.log(`Closing child process with code ${code}`);
+      const zip = new AdmZip();
+      zip.addLocalFolder(`${baseImagePath}/tested_images`);
+      zip.writeZip(`${baseImagePath}/testing_zip_file.zip`);
+
+      return res.status(200).send(zip.toBuffer());
+    });
+  } catch(error) {
+    return res.status(422).json({ error: 'An error occured while processing image. Our team is working on resovling the issue.' });
   }
-
-  // Generate JWT token
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-
-  res.cookie('token', token);
-
-  res.redirect('/');
 };

@@ -3,6 +3,7 @@ const express = require('express');
 const multer  = require('multer');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const path = require('path');
 const userController = require('./controllers/v1/userController');
 const imageController = require('./controllers/v1/imageController');
 
@@ -25,7 +26,14 @@ app.use(function(req, res, next) {
   next();
 });
 
-const upload = multer({ dest: 'uploads/' })
+const storage = multer.diskStorage({
+  destination: 'uploads',
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  }
+})
+
+const upload = multer({ storage: storage });
 
 app.options('/v1', cors(corsOptions));
 
@@ -35,13 +43,9 @@ app.get('/', (request, response) => {
 
 app.post('/v1/login', userController.login);
 app.post('/v1/signup', userController.signup);
-
-app.post('/v1/batch-process', upload.array([
-  'files[]'
-]), async(req, res, next) =>  {
-  console.log('==========REQ: ', req.body);
-  const prediction = await PythonConnector.invoke('predict_from_img', req?.body?.file);
-  console.log('>>>>>>>>>>>', prediction);
+app.post('/v1/batch-process', upload.array('files'), (req, res) => {
+  const baseImagePath = __dirname;
+  imageController.batchProcess(req, res, baseImagePath);
 });
 
 app.listen(port, () => {

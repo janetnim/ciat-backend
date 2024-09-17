@@ -4,16 +4,16 @@ var promisify = (fn, ctx, ...args) => {
   }
 
   return new Promise((resolve, reject) => {
-      args.push((err, data) => {
-          if (err) {
-              reject(err);
-          }
-          else {
-              resolve(data);
-          }
-      });
+    args.push((err, data) => {
+        if (err) {
+            reject(err);
+        }
+        else {
+            resolve(data);
+        }
+    });
 
-      fn.apply(ctx, args)
+    fn.apply(ctx, args)
   });
 };
 
