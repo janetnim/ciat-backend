@@ -2,7 +2,7 @@
 Backend API for image processing model
 To run the repo:
 
-- Clone the repository locally
+- Clone the repository locally and checkout to the cloned folder
 
 - Install node packages via `yarn install`
 
