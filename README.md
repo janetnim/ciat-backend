@@ -8,4 +8,4 @@ To run the repo:
 
 - Then start the app: `node index.js`
 
-- Ensure the [frontend](https://github.com/janetnim/ciat-frontend/README.md) so you can interact with the app via the browser
+- Ensure the [frontend](https://github.com/janetnim/ciat-frontend/README.md) is running so you are able to interact with the app via the browser
