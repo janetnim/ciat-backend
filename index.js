@@ -3,7 +3,6 @@ const express = require('express');
 const multer  = require('multer');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const path = require('path');
 const userController = require('./controllers/v1/userController');
 const imageController = require('./controllers/v1/imageController');
 
@@ -38,14 +37,19 @@ const upload = multer({ storage: storage });
 app.options('/v1', cors(corsOptions));
 
 app.get('/', (request, response) => {
-  response.json({info: 'Node.js, Express, and Postgres API'})
+  imageController.runTestData(request, response, __dirname);
+
+  // response.json({info: 'Node.js, Express, and Postgres API'})
 });
 
 app.post('/v1/login', userController.login);
 app.post('/v1/signup', userController.signup);
+
 app.post('/v1/batch-process', upload.array('files'), (req, res) => {
-  const baseImagePath = __dirname;
-  imageController.batchProcess(req, res, baseImagePath);
+  imageController.batchProcess(req, res, __dirname);
+});
+app.post('/v1/run-test-data', upload.array('files'), (req, res) => {
+  imageController.runTestData(req, res, __dirname);
 });
 
 app.listen(port, () => {

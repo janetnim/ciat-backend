@@ -18,6 +18,8 @@ test_data
 tested_images
 testing_zip_file
 testing_zip_file.zip
+flower_count_test_data.zip
+test
 
 # Editor directories and files
 .vscode/*
