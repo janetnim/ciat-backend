@@ -21,6 +21,7 @@ exports.batchProcess = async (req, res, baseImagePath) =>  {
       const zip = new AdmZip();
       req.files.forEach(file => zip.addLocalFile(`${baseImagePath}/tested_images/${file.filename}`));
       zip.writeZip(`${baseImagePath}/testing_zip_file.zip`);
+      fs.rmSync(`${baseImagePath}/tested_images`, { recursive: true, force: true });
 
       return res.status(200).send(zip.toBuffer());
     });
@@ -53,6 +54,7 @@ exports.runTestData = async (req, res, baseImagePath) => {
       const newZip = new AdmZip();
       mediaFiles.forEach(file => newZip.addLocalFile(`${baseImagePath}/tested_images/${file}`));
       newZip.writeZip(`${baseImagePath}/flower_count_test_results.zip`);
+      fs.rmSync(folderPath, { recursive: true, force: true });
 
       return res.status(200).send(newZip.toBuffer());
     });

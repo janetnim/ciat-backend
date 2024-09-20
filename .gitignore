@@ -16,9 +16,11 @@ dist-ssr
 uploads
 test_data
 tested_images
+flower_count_test_data
 testing_zip_file
 testing_zip_file.zip
-flower_count_test_data.zip
+flower_count_test_results
+flower_count_test_results.zip
 test
 
 # Editor directories and files

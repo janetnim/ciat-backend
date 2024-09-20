@@ -3,6 +3,7 @@ const express = require('express');
 const multer  = require('multer');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const spawn = require('child_process').spawn;
 const userController = require('./controllers/v1/userController');
 const imageController = require('./controllers/v1/imageController');
 
@@ -37,13 +38,24 @@ const upload = multer({ storage: storage });
 app.options('/v1', cors(corsOptions));
 
 app.get('/', (request, response) => {
-  imageController.runTestData(request, response, __dirname);
-
-  // response.json({info: 'Node.js, Express, and Postgres API'})
+  response.json({info: 'Node.js, Express, and Postgres API'})
 });
 
 app.post('/v1/login', userController.login);
 app.post('/v1/signup', userController.signup);
+
+const pythonPackagesProcess = spawn('python3', [
+  `${__dirname}/test_packages.py`
+]);
+
+pythonPackagesProcess.stdout.on('data', (data) => {
+  dataToSend = data.toString();
+  console.log('Receiving data from python script...', dataToSend);
+});
+
+pythonPackagesProcess.on('close', (code) => {
+  console.log(`Closing child process after package installation with code ${code}`);
+});
 
 app.post('/v1/batch-process', upload.array('files'), (req, res) => {
   imageController.batchProcess(req, res, __dirname);
